@@ -19,12 +19,16 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
 
+from authenticate.views import UserRegistrationView, UserLoginView
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('authenticate/', include('authenticate.urls')),
-    
+    path('signup/', UserRegistrationView.as_view(), name="signup"),
+    path('signin/', UserLoginView.as_view(), name="signin"),
 ]
 
 if settings.DEBUG:

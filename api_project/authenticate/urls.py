@@ -25,8 +25,6 @@ from .views import UserRegistrationView, UserLoginView, UserProfileView
 ] """
 
 urlpatterns = [
-    path('signup/', UserRegistrationView.as_view(), name="signup"),
-    path('signin/', UserLoginView.as_view(), name="signin"),
     path('profile/', UserProfileView.as_view(), name="profile"),
 ]
 

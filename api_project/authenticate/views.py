@@ -3,9 +3,13 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from django.shortcuts import get_object_or_404
 
 from .serializers import UserRegistrationSerializer, UserLoginSerializer
 from .models import UserProfile
+
+
+
 
 
 class UserRegistrationView(CreateAPIView):
@@ -45,6 +49,9 @@ class UserLoginView(RetrieveAPIView):
 
         return Response(response, status=status_code)
 
+    def get(self, request):
+        return Response()
+
 
 class UserProfileView(RetrieveAPIView):
 
@@ -62,9 +69,6 @@ class UserProfileView(RetrieveAPIView):
                 'data': [{
                     'first_name': user_profile.first_name,
                     'last_name': user_profile.last_name,
-                    'phone_number': user_profile.phone_number,
-                    'age': user_profile.age,
-                    'gender': user_profile.gender,
                     }]
                 }
 
