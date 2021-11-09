@@ -20,6 +20,7 @@ from django.conf import settings
 from django.urls import include, path
 
 from authenticate.views import UserRegistrationView, UserLoginView
+from api.views import ProjectRegistrationView
 
 
 urlpatterns = [
@@ -29,6 +30,7 @@ urlpatterns = [
     path('authenticate/', include('authenticate.urls')),
     path('signup/', UserRegistrationView.as_view(), name="signup"),
     path('signin/', UserLoginView.as_view(), name="signin"),
+    path('projects/', ProjectRegistrationView.as_view(), name="projects"),
 ]
 
 if settings.DEBUG:
