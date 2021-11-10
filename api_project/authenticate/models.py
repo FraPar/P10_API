@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
 class UserManager(BaseUserManager):
@@ -38,22 +38,15 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(
-        verbose_name='email address',
-        max_length=255,
-        unique=True
-        )
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    username = None
+    email = models.EmailField(unique=True)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    # Tells Django that the UserManager class defined above should manage
-    # objects of this type.
     objects = UserManager()
 
     def __str__(self):
@@ -64,17 +57,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         to set table name in database
         '''
         db_table = "login"
-
-
-class UserProfile(models.Model):
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    first_name = models.CharField(max_length=50, unique=False)
-    last_name = models.CharField(max_length=50, unique=False)
-
-    class Meta:
-        '''
-        to set table name in database
-        '''
-        db_table = "profile"

@@ -5,8 +5,8 @@ from authenticate.models import User
 
 
 class Projects(models.Model):
-
-    author_user_id = models.ForeignKey(to=User, unique=True, on_delete=models.CASCADE)
+    # COMMENT FAIRE POUR AVOIR LE FIELD ID !?
+    author_user_id = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', unique=True, on_delete=models.CASCADE)
     project_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=128)
     description = models.CharField(max_length=2048, blank=True)

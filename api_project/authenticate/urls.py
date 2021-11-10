@@ -17,7 +17,7 @@ Including another URLconf
 from django.conf import settings
 from django.urls import include, path
 
-from .views import UserRegistrationView, UserLoginView, UserProfileView
+from .views import UserRegistrationView, UserLoginView
 
 
 """ urlpatterns = [
@@ -25,7 +25,7 @@ from .views import UserRegistrationView, UserLoginView, UserProfileView
 ] """
 
 urlpatterns = [
-    path('profile/', UserProfileView.as_view(), name="profile"),
+
 ]
 
 if settings.DEBUG:
