@@ -18,10 +18,13 @@ import debug_toolbar
 from django.contrib import admin
 from django.conf import settings
 from django.urls import include, path
+from rest_framework import routers
 
 from authenticate.views import UserRegistrationView, UserLoginView
-from api.views import ProjectRegistrationView
+from api.views import ProjectViewSet
 
+router = routers.SimpleRouter()
+router.register('projects', ProjectViewSet, basename='projects')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,7 +33,7 @@ urlpatterns = [
     path('authenticate/', include('authenticate.urls')),
     path('signup/', UserRegistrationView.as_view(), name="signup"),
     path('signin/', UserLoginView.as_view(), name="signin"),
-    path('projects/', ProjectRegistrationView.as_view(), name="projects"),
+    path('', include(router.urls))
 ]
 
 if settings.DEBUG:

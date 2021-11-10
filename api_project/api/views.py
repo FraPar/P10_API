@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
@@ -7,9 +8,10 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from .serializers import ProjectSerializer
 from authenticate.models import User
 from .models import Projects
+import re
 
 
-class ProjectRegistrationView(CreateAPIView):
+class ProjectViewSet(ModelViewSet):
 
     permission_classes = (IsAuthenticated,)
     authentication_class = JSONWebTokenAuthentication
@@ -23,7 +25,9 @@ class ProjectRegistrationView(CreateAPIView):
 
         for project in project_all:
             print(project)
+            print(project.author_user)
             print(project.author_user_id)
+            print(project.project_id)
             print(project.title)
             print(project.description)
 
@@ -48,7 +52,7 @@ class ProjectRegistrationView(CreateAPIView):
         print(user_profile)
         print(user_profile.id)
 
-        serializer.save(author_user_id=user_profile)
+        serializer.save(author_user_id=user_profile.id)
         status_code = status.HTTP_201_CREATED
         response = {
             'success' : 'True',
@@ -57,3 +61,21 @@ class ProjectRegistrationView(CreateAPIView):
             }
         
         return Response(response, status=status_code)
+
+    def get_queryset(self):
+        queryset = Projects.objects.all()
+        # for projects in queryset:
+        #     print("projects-LIST")
+        #     print(projects)
+        #     print(projects.project_id)
+        # category_id = re.findall('\d+', self.request.path)
+        try:
+            project_id = self.request.path.split('/')[-2]
+        # print("project_id")
+        # print(project_id)
+            if project_id is not None:
+                queryset = queryset.filter(project_id=project_id)
+        except:
+            pass
+
+        return queryset
