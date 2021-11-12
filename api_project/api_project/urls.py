@@ -21,10 +21,11 @@ from django.urls import include, path
 from rest_framework import routers
 
 from authenticate.views import UserRegistrationView, UserLoginView
-from api.views import ProjectViewSet
+from api.views import ProjectViewSet, UserProjectViewSet
 
 router = routers.SimpleRouter()
 router.register('projects', ProjectViewSet, basename='projects')
+router.register('projects/{id}/users', UserProjectViewSet, basename='user_projects')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

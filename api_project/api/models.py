@@ -24,3 +24,16 @@ class Projects(models.Model):
         to set table name in database
         '''
         db_table = "projects"
+
+
+class Contributors(models.Model):
+    user_id = models.ForeignKey(User, null = True, to_field='id', on_delete=models.CASCADE)
+    project_id = models.ForeignKey(Projects, null = True, to_field='project_id', on_delete=models.CASCADE)
+    permission_choices = (
+        ('Back-End', 'Back-End'),
+        ('Front-End', 'Front-End'),
+        ('iOS', 'iOS'),
+        ('Android', 'Android'),
+    )
+    permission = models.CharField(max_length=9, choices=permission_choices)
+    role = models.CharField(max_length=128)

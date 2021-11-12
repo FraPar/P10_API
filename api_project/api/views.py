@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
-from .serializers import ProjectSerializer
+from .serializers import ProjectSerializer, UserProjectSerializer
 from authenticate.models import User
-from .models import Projects
+from .models import Contributors, Projects
 
 
 class ProjectViewSet(ModelViewSet):
@@ -34,6 +34,10 @@ class ProjectViewSet(ModelViewSet):
         return Response(response, status=status_code)
 
     def get_queryset(self):
+        userset = User.objects.all()
+        for user in userset:
+            print(user.id)
+            print(user.email)
         queryset = Projects.objects.all()
         print("project")
         for project in queryset:
@@ -112,3 +116,23 @@ class ProjectViewSet(ModelViewSet):
 
         return Response(response, status=status_code)
         
+
+class UserProjectViewSet(ModelViewSet):
+
+    permission_classes = (IsAuthenticated,)
+    authentication_class = JSONWebTokenAuthentication
+    serializer_class = UserProjectSerializer
+
+    def get_queryset(self):
+        userset = User.objects.all()
+        for user in userset:
+            print(user.id)
+            print(user.email)
+        projectset = Projects.objects.all()
+        print("project")
+        for project in projectset:
+            print(project.project_id)
+        queryset = Contributors.objects.all()
+        print("TRYYYYYYYY")
+
+        return queryset
