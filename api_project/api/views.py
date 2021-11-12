@@ -51,19 +51,64 @@ class ProjectViewSet(ModelViewSet):
         queryset = Projects.objects.all()
         try:
             project_id = self.request.path.split('/')[2]
-            if project_id is not None:
-                queryset = queryset.filter(project_id=project_id)
+            queryset = queryset.filter(project_id=project_id)
+            if queryset.exists():
                 data = request.data
                 queryset.update(title=data["title"], description=data["description"], type=data["type"])
+            
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'True',
+                    'status code' : status_code,
+                    'message': 'Project updated successfully',
+                    }
+            else:
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'False',
+                    'status code' : status_code,
+                    'message': 'Project not founded',
+                    }
+        
         except:
-            pass
-
-        status_code = status.HTTP_201_CREATED
-
-        response = {
-            'success' : 'True',
-            'status code' : status_code,
-            'message': 'Project updated successfully',
-            }
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Project not founded',
+                }
 
         return Response(response, status=status_code)
+
+    def destroy(self, request, *args, **kwargs):
+        queryset = Projects.objects.all()
+        try:
+            project_id = self.request.path.split('/')[2]
+            queryset = queryset.filter(project_id=project_id)
+            if queryset.exists():
+                queryset.delete()
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'True',
+                    'status code' : status_code,
+                    'message': 'Project deleted successfully',
+                    }
+
+            else:
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'False',
+                    'status code' : status_code,
+                    'message': 'Project not founded',
+                    }
+        except:
+            status_code = status.HTTP_201_CREATED
+
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Project not founded',
+                }
+
+        return Response(response, status=status_code)
+        
