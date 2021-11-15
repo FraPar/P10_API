@@ -6,7 +6,7 @@ from authenticate.models import User
 
 class Projects(models.Model):
     # COMMENT FAIRE POUR AVOIR LE FIELD ID !?
-    author_user = models.ForeignKey(settings.AUTH_USER_MODEL, null = True, to_field='id', on_delete=models.CASCADE)
+    author_user = models.ForeignKey(settings.AUTH_USER_MODEL, null = True, unique=True, to_field='id', on_delete=models.CASCADE)
     project_id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
     title = models.CharField(max_length=128)
     description = models.CharField(max_length=2048, blank=True)
@@ -27,8 +27,8 @@ class Projects(models.Model):
 
 
 class Contributors(models.Model):
-    user_id = models.ForeignKey(User, null = True, to_field='id', on_delete=models.CASCADE)
-    project_id = models.ForeignKey(Projects, null = True, to_field='project_id', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null = True, to_field='id', unique=True, on_delete=models.CASCADE)
+    project = models.ForeignKey(Projects, null = True, to_field='project_id', on_delete=models.CASCADE)
     permission_choices = (
         ('Back-End', 'Back-End'),
         ('Front-End', 'Front-End'),

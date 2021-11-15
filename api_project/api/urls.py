@@ -16,10 +16,14 @@ Including another URLconf
 
 from django.conf import settings
 from django.urls import include, path
+from rest_framework import routers
+from .views import UserProjectViewSet
 
-urlpatterns = [
-    
-]
+
+router = routers.SimpleRouter()
+# router.register(r'projects/(?P<id>)/users', UserProjectViewSet, basename='user_projects')
+
+urlpatterns = router.urls
 
 if settings.DEBUG:
     import debug_toolbar

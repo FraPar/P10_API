@@ -91,7 +91,7 @@ DATABASES = {
 # Our own User Model
 AUTH_USER_MODEL = 'authenticate.User'
 REST_FRAMEWORK = {
-     'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES': [
          'rest_framework.permissions.IsAuthenticated',
          'rest_framework.permissions.IsAdminUser',
          ],

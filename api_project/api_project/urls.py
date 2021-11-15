@@ -24,8 +24,9 @@ from authenticate.views import UserRegistrationView, UserLoginView
 from api.views import ProjectViewSet, UserProjectViewSet
 
 router = routers.SimpleRouter()
-router.register('projects', ProjectViewSet, basename='projects')
-router.register('projects/{id}/users', UserProjectViewSet, basename='user_projects')
+router.register(r'projects', ProjectViewSet, basename='projects')
+router.register(r'users', UserProjectViewSet, basename='user_projects')
+# re_path(r'^projects/(?P<pk>[0-9]+)/$', UserProjectViewSet, basename='user_projects'),
 
 urlpatterns = [
     path('admin/', admin.site.urls),
