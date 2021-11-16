@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
-from .serializers import ProjectSerializer, UserProjectSerializer
+from .serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
 from .models import Contributors, Projects
 
@@ -119,11 +119,11 @@ class ProjectViewSet(ModelViewSet):
         return Response(response, status=status_code)
         
 
-class UserProjectViewSet(ModelViewSet):
+class ContributorViewSet(ModelViewSet):
 
     permission_classes = (IsAuthenticated,)
     authentication_class = JSONWebTokenAuthentication
-    serializer_class = UserProjectSerializer
+    serializer_class = ContributorSerializer
 
     def post(self, request, pk):
         print("post pk")
@@ -152,32 +152,89 @@ class UserProjectViewSet(ModelViewSet):
         
         return Response(response, status=status_code)
 
-
     def get_queryset(self):
-
         userset = User.objects.all()
-        for user in userset:
-            print(user.id)
-            print(user.email)
+        # for user in userset:
+            # print(user.id)
+            # print(user.email)
         projectset = Projects.objects.all()
-        print("project in ProjectViewSet")
-        for project in projectset:
-            print(project.project_id)
-        print("contributorset")
+        # print("project in ProjectViewSet")
+        # for project in projectset:
+            # print(project.project_id)
+        # print("contributorset")
         project_id = self.request.path.split('/')[2]
         print("project_id")
         print(project_id)
         queryset = Contributors.objects.filter(project=project_id)
-        print("queryset")
-        print(queryset)
-        print(queryset.values)
+        # print("queryset Contribs")
+        # print(queryset)
+        # print(queryset.values)
         for contribs in queryset:
-            print(contribs)
-            print(contribs.project)
-            print(contribs.project_id)
+            # print(contribs)
+            # print(contribs.project)
+            # print(contribs.project_id)
             print(contribs.user)
             print(contribs.user_id)
-            print(contribs.permission)
-        # queryset = contributorset.filter(project_id=project_id)
+            # print(contribs.permission)
 
+        # queryset = contributorset.filter(project_id=project_id)
         return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        queryset = Contributors.objects.all()
+        try:
+            project_id = self.request.path.split('/')[2]
+            queryset = queryset.filter(project=project_id,user=request.data["user_id"])
+            if queryset.exists():
+                queryset.delete()
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'True',
+                    'status code' : status_code,
+                    'message': 'Contributor deleted successfully',
+                    }
+
+            else:
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'False',
+                    'status code' : status_code,
+                    'message': 'Contributor not founded',
+                    }
+        except:
+            status_code = status.HTTP_201_CREATED
+
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Contributor not founded',
+                }
+
+        return Response(response, status=status_code)
+
+
+class IssueViewSet(ModelViewSet):
+
+    permission_classes = (IsAuthenticated,)
+    authentication_class = JSONWebTokenAuthentication
+    serializer_class = IssueSerializer 
+
+    def post(self, request, pk):
+
+        serializer = self.serializer_class(data=request.data)
+        print("serializer")
+        print(serializer)
+        print("pk")
+        print(pk)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(project_id=pk)
+        status_code = status.HTTP_201_CREATED
+        response = {
+            'success' : 'True',
+            'status code' : status_code,
+            'message': 'Project registered successfully',
+            }
+        
+        return Response(response, status=status_code)

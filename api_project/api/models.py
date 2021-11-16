@@ -37,3 +37,25 @@ class Contributors(models.Model):
     )
     permission = models.CharField(max_length=9, choices=permission_choices)
     role = models.CharField(max_length=128)
+
+
+class Issues(models.Model):
+    issue_id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
+    title = models.CharField(max_length=128)
+    desc = models.CharField(max_length=128)
+    tag = models.CharField(max_length=128)
+    priority = models.CharField(max_length=128)
+    project = models.ForeignKey(Projects, null = True, to_field='project_id', on_delete=models.CASCADE)
+    status = models.CharField(max_length=128)
+    # author_user = models.ForeignKey(Projects, null = True, to_field='author_user', on_delete=models.CASCADE)
+    assignee_user_id = models.ForeignKey(settings.AUTH_USER_MODEL, null = True, to_field='id', on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+
+
+class Comments(models.Model):
+    comment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
+    description = models.CharField(max_length=128)
+    author_user = models.ForeignKey(settings.AUTH_USER_MODEL, null = True, to_field='id', on_delete=models.CASCADE)
+    issue_id = models.ForeignKey(Issues, null = True, to_field='issue_id', on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True)
+    

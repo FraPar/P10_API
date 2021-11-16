@@ -21,11 +21,12 @@ from django.urls import include, path
 from rest_framework import routers
 
 from authenticate.views import UserRegistrationView, UserLoginView
-from api.views import ProjectViewSet, UserProjectViewSet
+from api.views import ProjectViewSet, ContributorViewSet, IssueViewSet
 
 router = routers.SimpleRouter()
 router.register(r'projects', ProjectViewSet, basename='projects')
-router.register(r'users', UserProjectViewSet, basename='user_projects')
+router.register(r'users', ContributorViewSet, basename='contributors')
+router.register(r'issues', IssueViewSet, basename='issues')
 # re_path(r'^projects/(?P<pk>[0-9]+)/$', UserProjectViewSet, basename='user_projects'),
 
 urlpatterns = [
