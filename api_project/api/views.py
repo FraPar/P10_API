@@ -9,7 +9,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from .serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
-from .models import Contributors, Projects
+from .models import Comments, Contributors, Issues, Projects
 
 
 class ProjectViewSet(ModelViewSet):
@@ -222,10 +222,10 @@ class IssueViewSet(ModelViewSet):
     def post(self, request, pk):
 
         serializer = self.serializer_class(data=request.data)
-        print("serializer")
-        print(serializer)
-        print("pk")
-        print(pk)
+        # print("serializer")
+        # print(serializer)
+        # print("pk")
+        # print(pk)
 
         serializer.is_valid(raise_exception=True)
 
@@ -238,3 +238,171 @@ class IssueViewSet(ModelViewSet):
             }
         
         return Response(response, status=status_code)
+
+    def get_queryset(self):
+        project_id = self.request.path.split('/')[2]
+        queryset = Issues.objects.filter(project=project_id)
+        for issues in queryset:
+            # print(contribs)
+            # print(contribs.project)
+            # print(contribs.project_id)
+            print(issues.project)
+            print(issues.title)
+            print(issues.issue_id)
+            # print(contribs.permission)
+        return queryset
+
+    def update(self, request, *args, **kwargs):
+        queryset = Issues.objects.all()
+        try:
+            project_id = self.request.path.split('/')[2]
+            queryset = queryset.filter(issue_id=request.data["issue_id"])
+            if queryset.exists():
+                data = request.data
+                queryset.update(title=data["title"], desc=data["desc"], tag=data["tag"], priority=data["priority"], status=data["status"])
+            
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'True',
+                    'status code' : status_code,
+                    'message': 'Project updated successfully',
+                    }
+            else:
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'False',
+                    'status code' : status_code,
+                    'message': 'Project not founded',
+                    }
+        
+        except:
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Project not founded',
+                }
+
+        return Response(response, status=status_code)
+
+    def destroy(self, request, *args, **kwargs):
+        queryset = Issues.objects.all()
+        try:
+            project_id = self.request.path.split('/')[2]
+            queryset = queryset.filter(project_id=project_id,issue_id=request.data["issue_id"])
+            if queryset.exists():
+                queryset.delete()
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'True',
+                    'status code' : status_code,
+                    'message': 'Issue deleted successfully',
+                    }
+
+            else:
+                status_code = status.HTTP_201_CREATED
+                response = {
+                    'success' : 'False',
+                    'status code' : status_code,
+                    'message': 'Issue not founded',
+                    }
+        except:
+            status_code = status.HTTP_201_CREATED
+
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Issue not founded',
+                }
+
+        return Response(response, status=status_code)
+
+
+class CommentViewSet(ModelViewSet):
+
+    permission_classes = (IsAuthenticated,)
+    authentication_class = JSONWebTokenAuthentication
+    serializer_class = CommentSerializer 
+
+    def post(self, request, pk):
+
+        serializer = self.serializer_class(data=request.data)
+        # print("serializer")
+        # print(serializer)
+        # print("pk")
+        # print(pk)
+        # print("request.user")
+        # print(request.user)
+        # print(request.user.id)
+
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(author_user=request.user)
+        status_code = status.HTTP_201_CREATED
+        response = {
+            'success' : 'True',
+            'status code' : status_code,
+            'message': 'Comment registered successfully',
+            }
+        
+        return Response(response, status=status_code)
+
+    def get_queryset(self):
+        issue_id = self.request.path.split('/')[2]
+        queryset = Comments.objects.filter(issue_id=issue_id)
+        for comments in queryset:
+            print(comments.issue_id)
+            print(comments.description)
+        return queryset
+
+    def update(self, request, *args, **kwargs):
+        queryset = Comments.objects.all()
+        project_id = self.request.path.split('/')[2]
+        queryset = queryset.filter(comment_id=request.data["comment_id"])
+        print(queryset)
+        if queryset.exists():
+            data = request.data
+            print("data")
+            print(data)
+            queryset.update(description=data["description"])
+        
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'True',
+                'status code' : status_code,
+                'message': 'Comment updated successfully',
+                }
+        else:
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Comment not founded1',
+                }
+        
+        return Response(response, status=status_code)
+
+    def destroy(self, request, *args, **kwargs):
+        queryset = Comments.objects.all()
+
+        comment_id = self.request.path.split('/')[2]
+        queryset = queryset.filter(comment_id=comment_id)
+        print(queryset)
+        if queryset.exists():
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'True',
+                'status code' : status_code,
+                'message': 'Comment deleted successfully',
+                }
+
+        else:
+            status_code = status.HTTP_201_CREATED
+            response = {
+                'success' : 'False',
+                'status code' : status_code,
+                'message': 'Comment not founded1',
+                }
+
+        return Response(response, status=status_code)
+        
