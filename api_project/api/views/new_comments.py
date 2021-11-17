@@ -13,39 +13,42 @@ from authenticate.models import User
 from api.models import Comments, Contributors, Issues, Projects
 
 
-class ContributorMixin:
-    @action(detail=True, methods=["get", "post", "delete"])
-    def users(self, request, pk=None):
+class CommentMixin:
+    @action(detail=True, methods=["get", "post", "put", "delete"])
+    def comments(self, request, pk=None):
         project = self.get_object()
         #project = self.get_all()
         #project = self.get_single()
 
-        class ContributorViewSet(ModelViewSet):
+        class CommentViewSet(ModelViewSet):
 
             # permission_classes = (IsAuthenticated,)
             # authentication_class = JSONWebTokenAuthentication
-            serializer_class = ContributorSerializer
-            queryset = project.contributors_set.all()
+            serializer_class = CommentSerializer
+            queryset = project.comments_set.all()
 
         if request.method == "GET":
             print("get")
-            viewset = ContributorViewSet(request=request, format_kwarg=format)
+            viewset = CommentViewSet(request=request, format_kwarg=format)
             return viewset.list(request)
 
         if request.method == "POST":
             print("post")
             data = request.data
             print(data)
-            print(data["user_id"])
-            print(data["project_id"])
-            print(data["permission"])
-            print(data["role"])
-            viewset = ContributorViewSet(request=request, format_kwarg=format)
+            print(pk)
+            viewset = CommentViewSet(request=request, format_kwarg=format)
+            return viewset.list(request)
+
+        if request.method == "PUT":
+            print("put")
+            data = request.data
+            viewset = CommentViewSet(request=request, format_kwarg=format)
             return viewset.list(request)
 
         if request.method == "DELETE" and pk is not None:
             print("delete")
             print(pk)
-            viewset = ContributorViewSet(request=request, format_kwarg=format)
+            viewset = CommentViewSet(request=request, format_kwarg=format)
             return viewset.list(request)
 

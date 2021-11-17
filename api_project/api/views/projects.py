@@ -11,8 +11,10 @@ from api.serializers import ProjectSerializer, ContributorSerializer, IssueSeria
 from authenticate.models import User
 from api.models import Comments, Contributors, Issues, Projects
 from .new_contributors import ContributorMixin
+from .new_issues import IssueMixin
+from .new_comments import CommentMixin
 
-class ProjectViewSet(ModelViewSet, ContributorMixin):
+class ProjectViewSet(ModelViewSet, ContributorMixin, IssueMixin, CommentMixin):
 
     # permission_classes = (IsAuthenticated,)
     # authentication_class = JSONWebTokenAuthentication
