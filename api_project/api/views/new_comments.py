@@ -22,8 +22,8 @@ class CommentMixin:
 
         class CommentViewSet(ModelViewSet):
 
-            # permission_classes = (IsAuthenticated,)
-            # authentication_class = JSONWebTokenAuthentication
+            permission_classes = (IsAuthenticated,)
+            authentication_class = JSONWebTokenAuthentication
             serializer_class = CommentSerializer
             queryset = project.comments_set.all()
 

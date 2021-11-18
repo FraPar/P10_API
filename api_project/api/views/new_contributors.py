@@ -22,8 +22,8 @@ class ContributorMixin:
 
         class ContributorViewSet(ModelViewSet):
 
-            # permission_classes = (IsAuthenticated,)
-            # authentication_class = JSONWebTokenAuthentication
+            permission_classes = (IsAuthenticated,)
+            authentication_class = JSONWebTokenAuthentication
             serializer_class = ContributorSerializer
             queryset = project.contributors_set.all()
 

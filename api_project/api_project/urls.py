@@ -22,9 +22,33 @@ from rest_framework import routers
 
 from authenticate.views import UserRegistrationView, UserLoginView
 from api.views import ProjectViewSet, ContributorViewSet, IssueViewSet,CommentViewSet
+from . import NestedSimpleRouter, NestedDefaultRouter
 
 router = routers.SimpleRouter()
 router.register(r'projects', ProjectViewSet, basename='projects')
+## generates:
+# /projects/
+# /projects/{pk}/
+
+users_router = NestedSimpleRouter(router, r'projects', lookup='projects')
+users_router.register(r'users', ContributorViewSet, basename='users')
+## generates:
+# /projects/{project_pk}/users/
+# /projects/{project_pk}/users/{users_pk}/
+
+issues_router = NestedSimpleRouter(router, r'projects', lookup='projects')
+issues_router.register(r'issues', IssueViewSet, basename='issues')
+## generates:
+# /projects/{project_pk}/issues/
+# /projects/{project_pk}/issues/{issues_pk}/
+
+comments_router = NestedSimpleRouter(issues_router, r'issues', lookup='issues')
+comments_router.register(r'comments', CommentViewSet, basename='comments')
+## generates:
+# /projects/{project_pk}/issues/{issues_pk}/comments/
+# /projects/{project_pk}/issues/{issues_pk}/comments/{comments_pk}/
+
+
 """ router.register(r'users', ContributorViewSet, basename='contributors')
 router.register(r'issues', IssueViewSet, basename='issues')
 router.register(r'comments', CommentViewSet, basename='comments') """
@@ -37,7 +61,10 @@ urlpatterns = [
     path('authenticate/', include('authenticate.urls')),
     path('signup/', UserRegistrationView.as_view(), name="signup"),
     path('signin/', UserLoginView.as_view(), name="signin"),
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('', include(users_router.urls)),
+    path('', include(issues_router.urls)),
+    path('', include(comments_router.urls))
 ]
 
 if settings.DEBUG:

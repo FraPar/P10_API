@@ -14,10 +14,10 @@ from .new_contributors import ContributorMixin
 from .new_issues import IssueMixin
 from .new_comments import CommentMixin
 
-class ProjectViewSet(ModelViewSet, ContributorMixin, IssueMixin, CommentMixin):
+class ProjectViewSet(ModelViewSet):
 
-    # permission_classes = (IsAuthenticated,)
-    # authentication_class = JSONWebTokenAuthentication
+    permission_classes = (IsAuthenticated,)
+    authentication_class = JSONWebTokenAuthentication
     serializer_class = ProjectSerializer
 
     def post(self, request):

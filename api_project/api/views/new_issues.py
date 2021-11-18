@@ -21,10 +21,10 @@ class IssueMixin:
         #project = self.get_all()
         #project = self.get_single()
 
-        class IssueViewSet(ModelViewSet):
+        class IssueViewSet(ModelViewSet, CommentMixin):
 
-            # permission_classes = (IsAuthenticated,)
-            # authentication_class = JSONWebTokenAuthentication
+            permission_classes = (IsAuthenticated,)
+            authentication_class = JSONWebTokenAuthentication
             serializer_class = IssueSerializer
             queryset = project.issues_set.all()
 
