@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'api',
     'authenticate',
-    'rest_framework',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -128,6 +128,17 @@ JWT_AUTH = {
   'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=30),
   'JWT_AUTH_HEADER_PREFIX': 'Bearer',
   'JWT_AUTH_COOKIE': None,
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
 }
 
 # Password validation
