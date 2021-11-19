@@ -8,84 +8,61 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework.decorators import action
 
 from api.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
 from api.models import Comments, Contributors, Issues, Projects
 
 
-class ContributorViewSet(viewsets.ViewSet):
+class ContributorViewSet(
+        CreateModelMixin, 
+        RetrieveModelMixin, 
+        UpdateModelMixin,
+        ListModelMixin,
+        DestroyModelMixin,
+        viewsets.GenericViewSet
+    ):
+
+    queryset = Contributors.objects.all()
 
     permission_classes = (IsAuthenticated,)
     authentication_class = JSONWebTokenAuthentication
     serializer_class = ContributorSerializer
 
-    def get(self, request, *args, **kwargs):
-        users = Contributors.objects.all()
-        serializer = ContributorSerializer(users, many=True)
-        print(request)
-        print(request.data)
-        print(request.user)
-        print(request.user.id)
+    def list(self, request, *args, **kwargs):
+        project_pk = self.kwargs["projects_pk"]
+        queryset = Contributors.objects.filter(project_id=project_pk)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
 
-    def create(self, request, pk):
-        print("post pk")
-        print(pk)
-        print("data=request.data")
-        print(request.data)
-
-        user_profile = User.objects.get(id=request.data["user_id"])
-        project_profile = Projects.objects.get(project_id=request.data["project_id"])
-
-        all_contributor = Contributors.objects.all()
-        print("all_contributor")
-        print(all_contributor)
-        serializer = self.serializer_class(data=request.data)
-
+    def create(self, request, *args, **kwargs):
+        user_id = request.data["user_id"]
+        project_pk = self.kwargs["projects_pk"]
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save(project_id=project_pk, user_id=user_id)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-        serializer.save(user=user_profile, project=project_profile)
-        
-        status_code = status.HTTP_201_CREATED
-        response = {
-            'success' : 'True',
-            'status code' : status_code,
-            'message': 'Contributor added successfully',
-            }
-        
-        return Response(response, status=status_code)
+    def retrieve(self,*args,**kwargs):
+        # print("DELETE1")
+        project_pk = self.kwargs["projects_pk"]
+        user_id = self.get_object().pk
+        # print(project_pk)
+        # print(user_id)
+        # instance = self.get_object()
+        # print(instance)
+        # self.perform_destroy(instance)
+        # print(Contributors.objects.filter(id=user_id))
+        Contributors.objects.filter(id=user_id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def destroy(self, request, *args, **kwargs):
-        queryset = Contributors.objects.all()
-        try:
-            project_id = self.request.path.split('/')[2]
-            queryset = queryset.filter(project=project_id,user=request.data["user_id"])
-            if queryset.exists():
-                queryset.delete()
-                status_code = status.HTTP_201_CREATED
-                response = {
-                    'success' : 'True',
-                    'status code' : status_code,
-                    'message': 'Contributor deleted successfully',
-                    }
-
-            else:
-                status_code = status.HTTP_201_CREATED
-                response = {
-                    'success' : 'False',
-                    'status code' : status_code,
-                    'message': 'Contributor not founded',
-                    }
-        except:
-            status_code = status.HTTP_201_CREATED
-
-            response = {
-                'success' : 'False',
-                'status code' : status_code,
-                'message': 'Contributor not founded',
-                }
-
-        return Response(response, status=status_code)
-
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)

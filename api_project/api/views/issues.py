@@ -6,29 +6,55 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework import viewsets
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 
 from api.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
 from api.models import Comments, Contributors, Issues, Projects
 
 
-class IssueViewSet(ModelViewSet):
+class IssueViewSet(
+        CreateModelMixin, 
+        RetrieveModelMixin, 
+        UpdateModelMixin,
+        DestroyModelMixin,
+        ListModelMixin,
+        viewsets.GenericViewSet
+    ):
+
+    queryset = Issues.objects.all()
 
     permission_classes = (IsAuthenticated,)
     authentication_class = JSONWebTokenAuthentication
     serializer_class = IssueSerializer 
 
-    def post(self, request, pk):
+    def list(self, request, *args, **kwargs):
+        project_pk = self.kwargs["projects_pk"]
+        queryset = Issues.objects.filter(project_id=project_pk)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
 
         serializer = self.serializer_class(data=request.data)
         # print("serializer")
         # print(serializer)
         # print("pk")
         # print(pk)
-
+        user_id = request.data["assignee_user_id"]
+        user_instance = User.objects.filter(id=user_id).first()
+        print(user_instance)
+        project_pk = self.kwargs["projects_pk"]
+        print(user_id)
         serializer.is_valid(raise_exception=True)
 
-        serializer.save(project_id=pk)
+        serializer.save(project_id=project_pk, assignee_user_id=user_instance)
         status_code = status.HTTP_201_CREATED
         response = {
             'success' : 'True',
@@ -37,82 +63,3 @@ class IssueViewSet(ModelViewSet):
             }
         
         return Response(response, status=status_code)
-
-    def get_queryset(self):
-        project_id = self.request.path.split('/')[2]
-        queryset = Issues.objects.filter(project=project_id)
-        for issues in queryset:
-            # print(contribs)
-            # print(contribs.project)
-            # print(contribs.project_id)
-            print(issues.project)
-            print(issues.title)
-            print(issues.issue_id)
-            # print(contribs.permission)
-        return queryset
-
-    def update(self, request, *args, **kwargs):
-        queryset = Issues.objects.all()
-        try:
-            project_id = self.request.path.split('/')[2]
-            queryset = queryset.filter(issue_id=request.data["issue_id"])
-            if queryset.exists():
-                data = request.data
-                queryset.update(title=data["title"], desc=data["desc"], tag=data["tag"], priority=data["priority"], status=data["status"])
-            
-                status_code = status.HTTP_201_CREATED
-                response = {
-                    'success' : 'True',
-                    'status code' : status_code,
-                    'message': 'Project updated successfully',
-                    }
-            else:
-                status_code = status.HTTP_201_CREATED
-                response = {
-                    'success' : 'False',
-                    'status code' : status_code,
-                    'message': 'Project not founded',
-                    }
-        
-        except:
-            status_code = status.HTTP_201_CREATED
-            response = {
-                'success' : 'False',
-                'status code' : status_code,
-                'message': 'Project not founded',
-                }
-
-        return Response(response, status=status_code)
-
-    def destroy(self, request, *args, **kwargs):
-        queryset = Issues.objects.all()
-        try:
-            project_id = self.request.path.split('/')[2]
-            queryset = queryset.filter(project_id=project_id,issue_id=request.data["issue_id"])
-            if queryset.exists():
-                queryset.delete()
-                status_code = status.HTTP_201_CREATED
-                response = {
-                    'success' : 'True',
-                    'status code' : status_code,
-                    'message': 'Issue deleted successfully',
-                    }
-
-            else:
-                status_code = status.HTTP_201_CREATED
-                response = {
-                    'success' : 'False',
-                    'status code' : status_code,
-                    'message': 'Issue not founded',
-                    }
-        except:
-            status_code = status.HTTP_201_CREATED
-
-            response = {
-                'success' : 'False',
-                'status code' : status_code,
-                'message': 'Issue not founded',
-                }
-
-        return Response(response, status=status_code)
-    
