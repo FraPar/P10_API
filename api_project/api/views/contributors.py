@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.decorators import action
+from api.permissions import AuthorAllStaffAllButEditOrReadOnly, IsAuthor, IsContributor
 
 from api.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
@@ -27,7 +28,7 @@ class ContributorViewSet(
 
     queryset = Contributors.objects.all()
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated, IsAuthor]
     authentication_class = JSONWebTokenAuthentication
     serializer_class = ContributorSerializer
 
@@ -51,18 +52,5 @@ class ContributorViewSet(
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def retrieve(self,*args,**kwargs):
-        # print("DELETE1")
-        project_pk = self.kwargs["projects_pk"]
-        user_id = self.get_object().pk
-        # print(project_pk)
-        # print(user_id)
-        # instance = self.get_object()
-        # print(instance)
-        # self.perform_destroy(instance)
-        # print(Contributors.objects.filter(id=user_id))
-        Contributors.objects.filter(id=user_id).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)

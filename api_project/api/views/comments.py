@@ -62,7 +62,7 @@ class CommentViewSet(
         response = {
             'success' : 'True',
             'status code' : status_code,
-            'message': 'Project registered successfully',
+            'message': 'Comment registered successfully',
             }
         
         return Response(response, status=status_code)
