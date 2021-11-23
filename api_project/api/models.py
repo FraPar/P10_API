@@ -27,7 +27,7 @@ class Projects(models.Model):
 
 
 class Contributors(models.Model):
-    user = models.ForeignKey(User, null = True, to_field='id', unique=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null = True, to_field='id', on_delete=models.CASCADE)
     project = models.ForeignKey(Projects, null = True, to_field='project_id', on_delete=models.CASCADE)
     permission_choices = (
         ('Back-End', 'Back-End'),

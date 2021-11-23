@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.decorators import action
-from api.permissions import AuthorAllStaffAllButEditOrReadOnly, IsAuthor, IsContributor
+from api.permissions import AuthorOrAdmin, IsAuthor, IsContributor
 
 from api.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
@@ -46,11 +46,18 @@ class ContributorViewSet(
     def create(self, request, *args, **kwargs):
         user_id = request.data["user_id"]
         project_pk = self.kwargs["projects_pk"]
+        queryset = Contributors.objects.filter(project_id=project_pk)
+        if queryset.exists():
+            for data in queryset:
+                test_id = data.user_id
+                if str(test_id) == str(user_id):
+                    return Response({"Status":"Utilisateur déjà présent sur ce projet"},status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(project_id=project_pk, user_id=user_id)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)

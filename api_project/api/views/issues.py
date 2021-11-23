@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework import viewsets
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
-from api.permissions import AuthorAllStaffAllButEditOrReadOnly, IsAuthor, IsContributor
+from api.permissions import AuthorOrAdmin, IsAuthor, IsContributor
 
 from api.serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, CommentSerializer
 from authenticate.models import User
