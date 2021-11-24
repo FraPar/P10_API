@@ -16,6 +16,9 @@ class UserRegistrationView(CreateAPIView):
 
     def post(self, request):
         try:
+            print(request.data)
+            # first_name = request.data["first_name"]
+            # last_name = request.data["last_name"]
             serializer = self.serializer_class(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()

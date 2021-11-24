@@ -43,12 +43,22 @@ class Issues(models.Model):
     issue_id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, editable=False)
     title = models.CharField(max_length=128)
     desc = models.CharField(max_length=128)
-    tag = models.CharField(max_length=128)
-    priority = models.CharField(max_length=128)
+    tag_choices = (
+        ('Bug', 'Bug'),
+        ('Tâche', 'Tâche'),
+        ('Amélioration', 'Amélioration'),
+    )
+    tag = models.CharField(max_length=12, choices=tag_choices)
+    priority_choices = (
+        ('Faible', 'Faible'),
+        ('Moyenne', 'Moyenne'),
+        ('Élevée', 'Élevée'),
+    )
+    priority = models.CharField(max_length=7, choices=priority_choices)
     project = models.ForeignKey(Projects, null = True, to_field='project_id', on_delete=models.CASCADE)
     status = models.CharField(max_length=128)
     author_user = models.ForeignKey(settings.AUTH_USER_MODEL, null = True, to_field='id', on_delete=models.CASCADE)
-    # assignee_user_id = models.ForeignKey(Projects, null = True, to_field='author_user', on_delete=models.CASCADE)
+    # assignee_user_id = models.ForeignKey(User, default=settings.AUTH_USER_MODEL, null = True, to_field='id', related_name="assignee_user", on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
 
 

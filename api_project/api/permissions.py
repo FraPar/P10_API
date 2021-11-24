@@ -61,7 +61,6 @@ class IsContributor (permissions.BasePermission):
             if request.user == data.user:
                 return True
 
-
     def has_object_permission(self, request, view, obj):
         project_id = request.path.split('/')[2]
         this_project = self.contributorset.filter(project_id=project_id)
