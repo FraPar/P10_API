@@ -25,11 +25,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile')
         username = User.objects.create_user(**validated_data)
         if profile_data:
-            print("inside profile_data")
-            User.objects.create(
-                first_name=profile_data['first_name'],
-                last_name=profile_data['last_name'],
-            )
+                username.first_name=profile_data['first_name']
+                username.last_name=profile_data['last_name']
+                username.save()
         return username
 
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
