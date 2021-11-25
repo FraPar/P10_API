@@ -13,6 +13,7 @@ Rentrez dans le dossier du projet : "cd P10_API/"
 Installer l'ensemble des modules : "pip install -r requirements.txt"
 
 Une fois effectué, il va falloir lancer les migrations via la démarche suivante:
+- "cd api_project/",
 - "python manage.py makemigrations",
 - "python manage.py migrate".
 
